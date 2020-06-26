@@ -14,7 +14,7 @@ import java.util.UUID;
 
 public class ConfigUtils {
 
-    private ConfigsManager configsManager;
+    private final ConfigsManager configsManager;
 
     public ConfigUtils(ConfigsManager configsManager) {
         this.configsManager = configsManager;
@@ -109,53 +109,18 @@ public class ConfigUtils {
         }
     }
 
-    // Updates a player's playerlist entry.
+    // Updates a player's player list entry.
     public void updatePlayerListEntry(String name, UUID uuid) {
         setAndSave("player-list.yml", name, uuid.toString());
     }
 
-    // Gets a list of custom colours.
-    public HashMap<String, String> getCustomColours() {
-        YamlConfiguration config = configsManager.getConfig("colors.yml");
-        HashMap<String, String> returnValue = new HashMap<>();
-
-        // Fill the HashMap with the custom colours.
-        Set<String> keys = config.getKeys(false);
-        for (String key : keys) {
-            returnValue.put(key, config.getString(key));
-        }
-
-        return returnValue;
-    }
-
     // Returns whether a custom colour exists.
     public boolean customColourExists(String name) {
-        return getCustomColours().containsKey(name);
-    }
-
-    // Adds a new custom colour.
-    public void addCustomColour(String name, String colour) {
-        setAndSave("colors.yml", name, colour);
-    }
-
-    // Removes a custom colour.
-    public void removeCustomColour(String name) {
-        setAndSave("colors.yml", name, null);
+        return false;
     }
 
     // Returns the custom colour, if any, that a player has.
     public String getCustomColour(Player player) {
-        HashMap<String, String> customColours = getCustomColours();
-
-        // The colour returned will be the first one found. Server owners will need to ensure that the permissions are either alphabetical, or only one per player.
-        for (String key : customColours.keySet()) {
-            // Not checking for OP, that would cause the first colour to always be chosen.
-            Permission permission = new Permission("chatcolor.custom." + key, PermissionDefault.FALSE);
-            if (player.hasPermission(permission)) {
-                return customColours.get(key);
-            }
-        }
-
         return null;
     }
 

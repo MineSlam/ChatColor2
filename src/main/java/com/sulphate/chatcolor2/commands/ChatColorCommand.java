@@ -17,10 +17,10 @@ import java.util.*;
 
 public class ChatColorCommand implements CommandExecutor {
 
-    private Messages M;
-    private ConfigUtils configUtils;
-    private ConfirmationsManager confirmationsManager;
-    private ConfigsManager configsManager;
+    private final Messages M;
+    private final ConfigUtils configUtils;
+    private final ConfirmationsManager confirmationsManager;
+    private final ConfigsManager configsManager;
 
     public ChatColorCommand(Messages M, ConfigUtils configUtils, ConfirmationsManager confirmationsManager, ConfigsManager configsManager) {
         this.M = M;
@@ -41,27 +41,11 @@ public class ChatColorCommand implements CommandExecutor {
                 return true;
             }
 
-            List<String> cmds = Arrays.asList("help", "commandshelp", "permissionshelp", "settingshelp", "set", "reset", "reload", "available", "gui", "add", "remove", "custom");
+            List<String> cmds = Arrays.asList("help", "reset", "reload", "gui");
             if (cmds.contains(args[0].toLowerCase())) {
                 switch (args[0].toLowerCase()) {
-                    case "help":
-                    case "commandshelp": {
+                    case "help": {
                         handleCommandsHelp(s);
-                        return true;
-                    }
-
-                    case "permissionshelp": {
-                        handlePermissionsHelp(s);
-                        return true;
-                    }
-
-                    case "settingshelp": {
-                        handleSettingsHelp(s);
-                        return true;
-                    }
-
-                    case "set": {
-                        handleSet(args, s);
                         return true;
                     }
 
@@ -77,116 +61,6 @@ public class ChatColorCommand implements CommandExecutor {
                         ColourGUIListener.reloadGUI(M, configUtils); // Reload the GUIs as well, to give up-to-date Strings.
 
                         s.sendMessage(M.PREFIX + M.RELOADED_MESSAGES);
-                        return true;
-                    }
-
-                    case "available": {
-                        String comma = GeneralUtils.colourise("&7, ");
-
-                        char[] availableColours = GeneralUtils.getAvailableColours(s);
-                        char[] availableModifiers = GeneralUtils.getAvailableModifiers(s);
-
-                        String colourString;
-                        String modifierString;
-
-                        StringBuilder builder = new StringBuilder();
-
-                        for (int i = 0; i < availableColours.length; i++) {
-                            char colour = availableColours[i];
-                            builder.append('&').append(colour).append(colour);
-
-                            if (i != availableColours.length - 1) {
-                                builder.append(comma);
-                            }
-                        }
-
-                        colourString = builder.toString();
-                        builder = new StringBuilder();
-
-                        for (int i = 0; i < availableModifiers.length; i++) {
-                            char mod = availableModifiers[i];
-                            builder.append('&').append(mod).append(mod);
-
-                            if (i != availableModifiers.length - 1) {
-                                builder.append(comma);
-                            }
-                        }
-
-                        modifierString = builder.toString();
-
-                        s.sendMessage(M.PREFIX + M.AVAILABLE_COLORS);
-                        s.sendMessage(GeneralUtils.colourise(" &7- &e" + M.PREFIX + M.COLORS + ": " + colourString));
-                        s.sendMessage(GeneralUtils.colourise(" &7- &e" + M.PREFIX + M.MODIFIERS + ": " + modifierString));
-                        return true;
-                    }
-
-                    case "gui": {
-                        ColourGUIListener.openGUI(s, M, configUtils);
-                        return true;
-                    }
-
-                    case "add": {
-                        // Add the new modifier to their chat colour.
-                        String modifierToAdd = getModifier(args[1]);
-                        String colour = configUtils.getColour(s.getUniqueId());
-                        String newColour = colour + modifierToAdd;
-
-                        configUtils.setColour(s.getUniqueId(), newColour);
-                        s.sendMessage(M.PREFIX + GeneralUtils.colourSetMessage(M.SET_OWN_COLOR, newColour, configUtils, M));
-                        return true;
-                    }
-
-                    case "remove": {
-                        // Remove the modifier from their chat colour.
-                        String modifierToRemove = getModifier(args[1]);
-                        String colour = configUtils.getColour(s.getUniqueId());
-                        String newColour = colour.replace(modifierToRemove, "");
-
-                        configUtils.setColour(s.getUniqueId(), newColour);
-                        s.sendMessage(M.PREFIX + GeneralUtils.colourSetMessage(M.SET_OWN_COLOR, newColour, configUtils, M));
-                        return true;
-                    }
-
-                    case "custom": {
-                        if (args[1].equals("list")) {
-                            s.sendMessage(M.PREFIX + M.CUSTOM_COLOR_LIST);
-
-                            HashMap<String, String> customColours = configUtils.getCustomColours();
-                            for (String colourName : customColours.keySet()) {
-                                s.sendMessage(GeneralUtils.colourSetMessage(M.CUSTOM_COLOR_FORMAT.replace("[color-name]", colourName), customColours.get(colourName), configUtils, M));
-                            }
-
-                            return true;
-                        }
-
-                        // The action to perform.
-                        String action = args[1];
-                        String name = args[2];
-
-                        if (action.equals("add")) {
-                            String colour = getColour(args[3]);
-                            String modifiers = "";
-
-                            // Build the modifiers.
-                            if (args.length > 4) {
-                                StringBuilder modifiersBuilder = new StringBuilder();
-
-                                for (int i = 4; i < args.length; i++) {
-                                    modifiersBuilder.append(getModifier(args[i]));
-                                }
-
-                                modifiers = modifiersBuilder.toString();
-                            }
-
-                            String fullColour = colour + modifiers;
-                            configUtils.addCustomColour(name, fullColour);
-                            s.sendMessage(M.PREFIX + GeneralUtils.colourSetMessage(M.ADDED_CUSTOM_COLOR.replace("[color-name]", name), fullColour, configUtils, M));
-                        }
-                        else if (action.equals("remove")) {
-                            configUtils.removeCustomColour(name);
-                            s.sendMessage(M.PREFIX + M.REMOVED_CUSTOM_COLOR.replace("[color-name]", name));
-                        }
-
                         return true;
                     }
                 }
@@ -243,7 +117,8 @@ public class ChatColorCommand implements CommandExecutor {
                     result = setColorFromArgs(s.getUniqueId(), args, configUtils);
                 }
 
-                s.sendMessage(M.PREFIX + GeneralUtils.colourSetMessage(M.SET_OWN_COLOR, result, configUtils, M));
+                // Removed because of DeluxeMenus menu
+//                s.sendMessage(M.PREFIX + GeneralUtils.colourSetMessage(M.SET_OWN_COLOR, result, configUtils, M));
             }
 
             return true;
