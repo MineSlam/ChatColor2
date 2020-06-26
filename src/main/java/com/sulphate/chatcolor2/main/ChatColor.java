@@ -62,30 +62,10 @@ public class ChatColor extends JavaPlugin {
         setupCommands();
         setupListeners();
 
-        // Startup messages.
-        List<String> messages = configUtils.getStartupMessages();
-
-        for (String message : messages) {
-            message = message.replace("[version]", getDescription().getVersion());
-            message = message.replace("[version-description]", "Custom Rainbow Chat Colors & Bug Fixes");
-            console.sendMessage(M.PREFIX + GeneralUtils.colourise(message));
-        }
-
         // Check whether PlaceholderAPI is installed, if it is load the expansion.
         if (manager.getPlugin("PlaceholderAPI") != null) {
             new PlaceholderAPIHook(this, configUtils, M).register();
             console.sendMessage(M.PREFIX + M.PLACEHOLDERS_ENABLED);
-        }
-        else {
-            console.sendMessage(M.PREFIX + M.PLACEHOLDERS_DISABLED);
-        }
-
-        // Send the relevant metrics message.
-        if (!metrics) {
-            console.sendMessage(M.PREFIX + M.METRICS_DISABLED);
-        }
-        else {
-            console.sendMessage(M.PREFIX + M.METRICS_ENABLED);
         }
 
         // Call join event for all online players.
@@ -134,8 +114,6 @@ public class ChatColor extends JavaPlugin {
     public void onDisable() {
         saveScheduler.stop();
         plugin = null;
-
-        console.sendMessage(M.PREFIX + M.SHUTDOWN.replace("[version]", getDescription().getVersion()));
     }
 
     public static ChatColor getPlugin() {
@@ -196,13 +174,6 @@ public class ChatColor extends JavaPlugin {
         // Save default messages if they don't exist.
         if (!messages.exists()) {
             saveResource("messages.yml", true);
-        }
-
-        File coloursFile = new File(dataFolder, "colors.yml");
-
-        // Save default colours file if it doesn't exist.
-        if (!coloursFile.exists()) {
-            saveResource("colors.yml", true);
         }
 
         File playerList = new File(dataFolder, "player-list.yml");
