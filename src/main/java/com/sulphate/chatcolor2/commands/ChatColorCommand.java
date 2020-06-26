@@ -118,7 +118,7 @@ public class ChatColorCommand implements CommandExecutor {
                 }
 
                 // Removed because of DeluxeMenus menu
-//                s.sendMessage(M.PREFIX + GeneralUtils.colourSetMessage(M.SET_OWN_COLOR, result, configUtils, M));
+                s.sendMessage(GeneralUtils.colourSetMessage(M.SET_OWN_COLOR, result, configUtils, M));
             }
 
             return true;
